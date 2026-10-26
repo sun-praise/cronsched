@@ -60,6 +60,23 @@ func main() {
 
 ## Usage
 
+### Use the database your program already has
+
+One option over your existing `*sql.DB` — SQLite, MySQL or Postgres. The
+dialect is detected from the driver name (overridable with `WithDialect`),
+and the tables are created on first use:
+
+```go
+db := myApp.OpenDB() // your existing handle; any database/sql driver
+s := cronsched.New(cronsched.WithSQLStore(db))
+```
+
+### Zero-config single file
+
+```go
+s := cronsched.New(cronsched.WithStore(cronsched.NewSQLiteStore("sched.db")))
+```
+
 ### Add / inspect / control
 
 ```go
@@ -86,9 +103,11 @@ for {
 
 ### Bring your own store
 
-`Store` is a small interface (9 methods). `MemStore` and `SQLiteStore` are
-provided; a Postgres store is a straightforward implementation, and the
-schema the SQLite store uses is intentionally plain (two tables, no magic).
+`Store` is a small interface (9 methods). `MemStore`, `SQLiteStore` and the
+generic `SQLStore` are provided; anything else — NoSQL, in-memory variants,
+your company's secret database — implements the interface, and the
+[storetest](https://pkg.go.dev/github.com/sun-praise/cronsched/storetest)
+subpackage gives you the exact contract suite CI runs against the built-ins.
 
 ## Expressions
 

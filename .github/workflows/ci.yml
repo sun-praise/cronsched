@@ -8,6 +8,31 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: cronsched_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -proot"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: cronsched_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -19,6 +44,12 @@ jobs:
         run: go test -count=1 -covermode=atomic -coverprofile=coverage.out ./...
       - name: Test (race)
         run: go test -race -count=1 .
+      - name: Test (mysql + postgres dialects)
+        working-directory: integration
+        run: go test -count=1 ./...
+        env:
+          CRONSCHED_MYSQL_DSN: root:root@tcp(127.0.0.1:3306)/cronsched_test
+          CRONSCHED_POSTGRES_DSN: postgres://postgres:postgres@127.0.0.1:5432/cronsched_test?sslmode=disable
       - name: Coverage summary
         run: go tool cover -func=coverage.out | tail -1
       - name: Upload coverage to Codecov

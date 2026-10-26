@@ -2,6 +2,7 @@ package cronsched
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"sync"
@@ -35,6 +36,15 @@ type Option func(*Scheduler)
 
 // WithStore sets the persistence backend. Default: MemStore.
 func WithStore(s Store) Option { return func(sc *Scheduler) { sc.store = s } }
+
+// WithSQLStore builds the store from a database handle your program
+// already owns — SQLite, MySQL or Postgres. The dialect is detected from
+// the driver name (override with WithSQLStore(db, WithDialect(...)));
+// tables are created on first use. Equivalent to
+// WithStore(NewSQLStore(db, opts...)).
+func WithSQLStore(db *sql.DB, opts ...SQLOption) Option {
+	return func(sc *Scheduler) { sc.store = NewSQLStore(db, opts...) }
+}
 
 // WithHandler sets the fire executor. When nil (the default), due
 // schedules are still advanced and audited — stamped "skipped: no handler
