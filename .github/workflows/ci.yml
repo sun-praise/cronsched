@@ -15,7 +15,14 @@ jobs:
           go-version: '1.26'
       - name: Vet
         run: go vet ./...
-      - name: Test
-        run: go test -count=1 ./...
+      - name: Test (with coverage)
+        run: go test -count=1 -covermode=atomic -coverprofile=coverage.out ./...
       - name: Test (race)
         run: go test -race -count=1 .
+      - name: Coverage summary
+        run: go tool cover -func=coverage.out | tail -1
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.out
+          fail_ci_if_error: false

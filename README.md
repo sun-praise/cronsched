@@ -1,5 +1,10 @@
 # cronsched
 
+[![CI](https://github.com/sun-praise/cronsched/actions/workflows/ci.yml/badge.svg)](https://github.com/sun-praise/cronsched/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/sun-praise/cronsched/graph/badge.svg)](https://codecov.io/gh/sun-praise/cronsched)
+[![Go Reference](https://pkg.go.dev/badge/github.com/sun-praise/cronsched.svg)](https://pkg.go.dev/github.com/sun-praise/cronsched)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 An embedded, persistent cron scheduler for Go single-binary daemons.
 
 `cronsched` is a cron scheduler whose state lives in a store instead of in
