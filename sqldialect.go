@@ -52,7 +52,7 @@ func (d SQLDialect) createStmts() []string {
 				enabled TINYINT NOT NULL DEFAULT 1,
 				next_fire_at DOUBLE NULL,
 				last_fired_at DOUBLE NULL,
-				last_result TEXT NOT NULL,
+				last_result TEXT NULL,
 				created_at DOUBLE NOT NULL,
 				INDEX idx_schedules_due (enabled, next_fire_at)
 			) ENGINE=InnoDB`,

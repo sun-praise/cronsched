@@ -23,7 +23,7 @@ type SQLStore struct {
 	// dialect is pinned by the constructor options or by driver-name
 	// detection on first use; "" means "detect lazily". Every method goes
 	// through ready() which pins it once.
-	dialect    SQLDialect
+	dialect SQLDialect
 
 	ensureOnce sync.Once
 	ensureErr  error
@@ -106,7 +106,16 @@ func (s *SQLStore) ready(ctx context.Context) error {
 }
 
 const sqlScheduleCols = `id, name, cron_expr, action, params, enabled,
-	COALESCE(next_fire_at,0), COALESCE(last_fired_at,0), last_result, created_at`
+	COALESCE(next_fire_at,0), COALESCE(last_fired_at,0), COALESCE(last_result,''), created_at`
+
+// btoi converts a bool to its integer persistence form (SMALLINT/TINYINT
+// columns reject driver-encoded booleans on some dialects — Postgres).
+func btoi(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
 
 func scanSQLSchedule(row interface{ Scan(...any) error }) (Schedule, error) {
 	var s Schedule
@@ -125,7 +134,7 @@ func (s *SQLStore) Add(ctx context.Context, n Schedule) (int64, error) {
 		return 0, err
 	}
 	if _, err := s.db.ExecContext(ctx, s.dialect.bindSQL(s.dialect.upsertStmt()),
-		n.Name, n.CronExpr, n.Action, n.Params, n.Enabled, n.NextFireAt, n.CreatedAt); err != nil {
+		n.Name, n.CronExpr, n.Action, n.Params, btoi(n.Enabled), n.NextFireAt, n.CreatedAt); err != nil {
 		return 0, fmt.Errorf("cronsched: schedule add %q: %w", n.Name, err)
 	}
 	// LastInsertId is unreliable on the UPDATE arm of the upsert (driver

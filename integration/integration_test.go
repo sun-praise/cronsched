@@ -15,9 +15,9 @@ import (
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 	"github.com/sun-praise/cronsched"
 	"github.com/sun-praise/cronsched/storetest"
-	_ "github.com/lib/pq"
 )
 
 func TestMySQLStoreContract(t *testing.T) {
