@@ -1,0 +1,19 @@
+cronsched
+Copyright 2026 sun-praise
+
+This product includes software developed by sun-praise
+(https://github.com/sun-praise).
+
+==============================================================================
+Third-party components
+==============================================================================
+
+github.com/robfig/cron/v3
+  Copyright (C) 2012 Rob Figueiredo
+  License: MIT — https://github.com/robfig/cron/blob/v3/LICENSE
+  Used for: standard cron expression parsing (cronexpr subpackage).
+
+modernc.org/sqlite
+  Copyright (c) 2017 The Sqlite Authors
+  License: BSD 3-Clause — https://gitlab.com/cznic/sqlite/-/blob/master/LICENSE
+  Used for: CGO-free SQLite storage backend (SQLiteStore).
