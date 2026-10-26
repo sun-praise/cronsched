@@ -131,6 +131,29 @@ per-cycle batch; if you need sub-minute cadence, use a ticker instead.
 - **Not an in-memory cron replacement** — if you don't need persistence or
   an audit trail, `robfig/cron` or `go-co-op/gocron` are simpler.
 
+## Related projects
+
+The scheduling landscape cronsched grew out of — each is worth a look, and
+several are the better tool for their niche:
+
+- [robfig/cron](https://github.com/robfig/cron) — the classic in-memory
+  cron; its standard parser powers the `cronexpr` subpackage. In-memory
+  only: state is lost on restart.
+- [go-co-op/gocron](https://github.com/go-co-op/gocron) — fluent in-memory
+  job scheduling with a friendly API.
+- [reugn/go-quartz](https://github.com/reugn/go-quartz) — Quartz-inspired
+  trigger abstraction, zero dependencies.
+- [riverqueue/river](https://github.com/riverqueue/river) — Postgres/SQLite
+  job queue with periodic jobs (the periodic schedule itself is held in
+  memory). The stronger tool when you need a full worker-pool queue.
+- [hibiken/asynq](https://github.com/hibiken/asynq) — Redis-backed
+  distributed task queue with periodic tasks; requires Redis.
+- [AGScheduler](https://agscheduler.github.io/agscheduler/) — scheduling
+  framework with persistence, clustering and remote calls.
+
+cronsched occupies the gap between them: an embedded cron library whose
+schedules and fire history persist without asking you to run anything.
+
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
