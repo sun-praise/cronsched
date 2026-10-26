@@ -9,7 +9,6 @@
 package integration
 
 import (
-	"context"
 	"database/sql"
 	"os"
 	"testing"
@@ -30,10 +29,10 @@ func TestMySQLStoreContract(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	st := cronsched.NewSQLStore(db)
-
-	// Fresh tables per run.
-	drop := func(t *testing.T) {
+	// Fresh tables per subtest: drop, then a NEW store instance — its
+	// lazy migrate rebuilds the schema (a reused instance's ensure-once
+	// would skip it).
+	drop := func(t *testing.T) cronsched.Store {
 		t.Helper()
 		for _, stmt := range []string{
 			`DROP TABLE IF EXISTS schedule_events`,
@@ -43,14 +42,9 @@ func TestMySQLStoreContract(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		if err := st.Migrate(context.Background()); err != nil {
-			t.Fatal(err)
-		}
+		return cronsched.NewSQLStore(db)
 	}
-	storetest.Contract(t, func(t *testing.T) cronsched.Store {
-		drop(t)
-		return st
-	})
+	storetest.Contract(t, drop)
 }
 
 func TestPostgresStoreContract(t *testing.T) {
@@ -63,10 +57,7 @@ func TestPostgresStoreContract(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	st := cronsched.NewSQLStore(db)
-
-	// Fresh tables per run.
-	drop := func(t *testing.T) {
+	drop := func(t *testing.T) cronsched.Store {
 		t.Helper()
 		for _, stmt := range []string{
 			`DROP TABLE IF EXISTS schedule_events`,
@@ -76,12 +67,7 @@ func TestPostgresStoreContract(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		if err := st.Migrate(context.Background()); err != nil {
-			t.Fatal(err)
-		}
+		return cronsched.NewSQLStore(db)
 	}
-	storetest.Contract(t, func(t *testing.T) cronsched.Store {
-		drop(t)
-		return st
-	})
+	storetest.Contract(t, drop)
 }
